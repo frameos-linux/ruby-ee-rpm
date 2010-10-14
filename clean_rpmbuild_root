@@ -1,0 +1,4 @@
+BASEDIR=~/rpmbuild/
+for srcdir in SRPMS RPMS SPECS SOURCES BUILD; do
+	rm -rf $BASEDIR/$srcdir/*
+done
