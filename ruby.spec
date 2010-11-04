@@ -18,6 +18,8 @@ Provides: ruby-irb
 Provides: ruby-rdoc
 Provides: ruby-libs
 Obsoletes: ruby-libs
+Obsoletes: ruby-irb
+Obsoletes: ruby-rdoc
 
 %description 
 Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which includes various enhancements:
@@ -33,7 +35,7 @@ Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which inclu
 # work around bug in "installer"
 mkdir -p $RPM_BUILD_ROOT/usr/lib/ruby/gems/1.8/gems
 # run installer
-./installer -c --enable-shared --auto /usr --dont-install-useful-gems --no-dev-docs --destdir $RPM_BUILD_ROOT
+./installer -c --enable-shared --auto /usr --dont-install-useful-gems --no-dev-docs --destdir %{buildroot}
 
 %install
 # no-op
