@@ -5,7 +5,7 @@ Summary: Ruby Enterprise Edition (Release %{phusion_release})
 Name: ruby
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 2.frameos
+Release: 3.frameos
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
@@ -13,6 +13,8 @@ Source0: ruby-enterprise-%{version}-%{phusion_release}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{phusion_release}-root-%(%{__id_u} -n)
 BuildRequires:	readline readline-devel ncurses ncurses-devel gdbm gdbm-devel glibc-devel autoconf gcc unzip openssl-devel db4-devel byacc
 BuildRequires: ruby
+BuildRequires: gcc-c++
+BuildRequires: make
 Provides: ruby(abi) = 1.8
 Provides: ruby-irb
 Provides: ruby-rdoc
@@ -64,6 +66,10 @@ rm -rf $RPM_BUILD_ROOT
 %exclude /usr/lib/ruby/site_ruby/1.8/rbconfig
 
 %changelog 
+* Thu Nov 04 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-3.frameos
+- Obsoletes ruby-irb ruby-rdoc
+- Build requires make gcc-c++
+
 * Thu Nov 03 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-2.frameos
 - Obsoletes ruby-libs
 
