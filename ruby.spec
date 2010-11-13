@@ -1,16 +1,24 @@
 # Package Maintainer: Increment phusion_release to match latest release available
 %define phusion_release	2010.02
+%define rubyver         1.8.7
+%define rubyxver        1.8
+
+%{!?ruby_vendorlib:     %global ruby_vendorlib  %{_prefix}/lib/ruby}
+%{!?ruby_vendorarch:    %global ruby_vendorarch %{_libdir}/ruby}
+%{!?ruby_sitelib:       %global ruby_sitelib    %{ruby_vendorlib}/site_ruby}
+%{!?ruby_sitearch:      %global ruby_sitearch   %{ruby_vendorarch}/site_ruby}
+
 
 Summary: Ruby Enterprise Edition (Release %{phusion_release})
-Name: ruby
+Name: ruby-ee
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 4.frameos
+Release: 5.frameos
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
 Source0: ruby-enterprise-%{version}-%{phusion_release}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{phusion_release}-root-%(%{__id_u} -n)
+BuildRoot: %{_tmppath}/ruby-%{version}-%{phusion_release}-root-%(%{__id_u} -n)
 BuildRequires:	readline readline-devel ncurses ncurses-devel gdbm gdbm-devel glibc-devel autoconf gcc unzip openssl-devel db4-devel byacc
 BuildRequires: ruby
 BuildRequires: gcc-c++
@@ -20,6 +28,7 @@ Provides: ruby-irb
 Provides: ruby-rdoc
 Provides: ruby-libs
 Provides: ruby-devel
+Obsoletes: ruby
 Obsoletes: ruby-libs
 Obsoletes: ruby-irb
 Obsoletes: ruby-rdoc
@@ -37,12 +46,34 @@ Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which inclu
 
 %build 
 # work around bug in "installer"
-mkdir -p $RPM_BUILD_ROOT/usr/lib/ruby/gems/1.8/gems
-# run installer
-./installer -c --enable-shared --auto /usr --dont-install-useful-gems --no-dev-docs --destdir %{buildroot}
+#mkdir -p $RPM_BUILD_ROOT/usr/lib/ruby/gems/1.8/gems
+## run installer
+#./installer -c --enable-shared --auto $RPM_BUILD_ROOT --dont-install-useful-gems --no-dev-docs --destdir $RPM_BUILD_ROOT
+#
+
+cd source
+CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -02"
+export CFLAGS
+patch -p1 -R < ../fast-threading.patch
+%configure \
+  --with-default-kcode=none \
+  --enable-shared \
+  --enable-pthread \
+  --disable-rpath \
+  --with-readline-include=%{_includedir}/readline5 \
+  --with-readline-lib=%{_libdir}/readline5 \
+  --with-sitedir='%{ruby_sitelib}' \
+  --with-sitearchdir='%{ruby_sitearch}' \
+  --with-vendordir='%{ruby_vendorlib}' \
+  --with-vendorarchdir='%{ruby_vendorarch}'
+
+make
 
 %install
-# no-op
+cd source
+make DESTDIR=$RPM_BUILD_ROOT \
+  install
+cp *.h $RPM_BUILD_ROOT/%{ruby_vendorarch}/%{rubyxver}/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -50,8 +81,10 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-,root,root)
 /usr/bin/*
-/usr/lib/*
+/usr/lib64/*
 /usr/share/man/man1/*
+%{ruby_vendorarch}/%{rubyxver}/*.h
+
 %doc source/ChangeLog
 %doc source/COPYING
 %doc source/LEGAL
@@ -60,14 +93,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc source/README
 %doc source/README.EXT
 %doc source/ToDo
-# rubygems
-%exclude /usr/bin/gem
-%exclude /usr/lib/ruby/gems
-%exclude /usr/lib/ruby/site_ruby/1.8/rubygems*
-%exclude /usr/lib/ruby/site_ruby/1.8/ubygems.rb
-%exclude /usr/lib/ruby/site_ruby/1.8/rbconfig
 
 %changelog 
+* Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-5.frameos
+- do not use installer script
+- define some ruby macros
+
 * Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-4.frameos
 - Obsoletes ruby-devel
 - Provides ruby-devel
