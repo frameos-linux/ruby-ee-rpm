@@ -5,7 +5,7 @@ Summary: Ruby Enterprise Edition (Release %{phusion_release})
 Name: ruby
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 3.frameos
+Release: 4.frameos
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
@@ -19,9 +19,11 @@ Provides: ruby(abi) = 1.8
 Provides: ruby-irb
 Provides: ruby-rdoc
 Provides: ruby-libs
+Provides: ruby-devel
 Obsoletes: ruby-libs
 Obsoletes: ruby-irb
 Obsoletes: ruby-rdoc
+Obsoletes: ruby-devel
 
 %description 
 Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which includes various enhancements:
@@ -66,6 +68,10 @@ rm -rf $RPM_BUILD_ROOT
 %exclude /usr/lib/ruby/site_ruby/1.8/rbconfig
 
 %changelog 
+* Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-4.frameos
+- Obsoletes ruby-devel
+- Provides ruby-devel
+
 * Thu Nov 04 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-3.frameos
 - Obsoletes ruby-irb ruby-rdoc
 - Build requires make gcc-c++
