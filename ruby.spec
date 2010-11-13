@@ -45,12 +45,6 @@ Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which inclu
 %setup -q -n ruby-enterprise-%{version}-%{phusion_release}
 
 %build 
-# work around bug in "installer"
-#mkdir -p $RPM_BUILD_ROOT/usr/lib/ruby/gems/1.8/gems
-## run installer
-#./installer -c --enable-shared --auto $RPM_BUILD_ROOT --dont-install-useful-gems --no-dev-docs --destdir $RPM_BUILD_ROOT
-#
-
 cd source
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -02"
 export CFLAGS
@@ -98,6 +92,8 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-5.frameos
 - do not use installer script
 - define some ruby macros
+- tcmalloc no longer used
+- renamed to ruby-ee
 
 * Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-4.frameos
 - Obsoletes ruby-devel
