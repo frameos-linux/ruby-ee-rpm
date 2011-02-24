@@ -1,5 +1,5 @@
 # Package Maintainer: Increment phusion_release to match latest release available
-%define phusion_release	2010.02
+%define phusion_release	2011.03
 %define rubyver         1.8.7
 %define rubyxver        1.8
 
@@ -13,7 +13,7 @@ Summary: Ruby Enterprise Edition (Release %{phusion_release})
 Name: ruby-ee
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 5.frameos
+Release: 6.%{phusion_release}.frameos
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc source/ToDo
 
 %changelog 
+* Thu Feb 24 2011 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-6.2011.03.frameos
+- updated to upstream 2011.03
+
 * Thu Nov 05 2010 Sergio Rubio <rubiojr@frameos.org> ruby-1.8.7-5.frameos
 - do not use installer script
 - define some ruby macros
