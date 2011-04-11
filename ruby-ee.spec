@@ -10,10 +10,10 @@
 
 
 Summary: Ruby Enterprise Edition (Release %{phusion_release})
-Name: ruby
+Name: ruby-ee
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 7.%{phusion_release}.frameos
+Release: 8.%{phusion_release}%{?dist}
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
@@ -28,7 +28,7 @@ Provides: ruby-irb
 Provides: ruby-rdoc
 Provides: ruby-libs
 Provides: ruby-devel
-Obsoletes: ruby-ee
+Obsoletes: ruby
 Obsoletes: ruby-libs
 Obsoletes: ruby-irb
 Obsoletes: ruby-rdoc
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc source/ToDo
 
 %changelog
+* Mon Apr 11 2011 Sergio Rubio <rubiojr@frameos.org> - 1.8.7-8.2011.03.frameos
+- Back to ruby-ee
+
 * Fri Apr 01 2011 Sergio Rubio <rubiojr@frameos.org> - 1.8.7-7.2011.03.frameos
 - obsoletes ruby-ee
 
