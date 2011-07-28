@@ -1,10 +1,12 @@
 # Package Maintainer: Increment phusion_release to match latest release available
 %define phusion_release	2011.03
-%define rubyver         1.8.7
-%define rubyxver        1.8
+%define rubyver		1.8.7
+%define rubyxver	1.8
 
-%{!?ruby_vendorlib:     %global ruby_vendorlib  %{_prefix}/lib/ruby}
-%{!?ruby_vendorarch:    %global ruby_vendorarch %{_libdir}/ruby}
+%define _prefix         /opt/ruby-ee
+%{!?ruby_prefix:        %global ruby_prefix     /opt/ruby-ee}
+%{!?ruby_vendorlib:     %global ruby_vendorlib  %{ruby_prefix}/lib/ruby}
+%{!?ruby_vendorarch:    %global ruby_vendorarch %{ruby_vendorlib}}
 %{!?ruby_sitelib:       %global ruby_sitelib    %{ruby_vendorlib}/site_ruby}
 %{!?ruby_sitearch:      %global ruby_sitearch   %{ruby_vendorarch}/site_ruby}
 
@@ -13,26 +15,19 @@ Summary: Ruby Enterprise Edition (Release %{phusion_release})
 Name: ruby-ee
 Vendor: Phusion.nl
 Version: 1.8.7
-Release: 8.%{phusion_release}%{?dist}
+Release: 9.%{phusion_release}%{?dist}
 License: GPL 
 Group: Development/Languages 
 URL: http://www.rubyenterpriseedition.com/
-Source0: ruby-enterprise-%{version}-%{phusion_release}.tar.gz
+Source0: http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise-%{version}-%{phusion_release}.tar.gz
+Source1: ruby-ee.sh
+Source2: ruby-ee.conf
 BuildRoot: %{_tmppath}/ruby-%{version}-%{phusion_release}-root-%(%{__id_u} -n)
 BuildRequires:	readline readline-devel ncurses ncurses-devel gdbm gdbm-devel glibc-devel autoconf gcc unzip openssl-devel db4-devel byacc
 BuildRequires: ruby
 BuildRequires: gcc-c++
 BuildRequires: make
 Provides: ruby(abi) = 1.8
-Provides: ruby-irb
-Provides: ruby-rdoc
-Provides: ruby-libs
-Provides: ruby-devel
-Obsoletes: ruby
-Obsoletes: ruby-libs
-Obsoletes: ruby-irb
-Obsoletes: ruby-rdoc
-Obsoletes: ruby-devel
 
 %description 
 Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which includes various enhancements:
@@ -46,14 +41,15 @@ Ruby Enterprise Edition is a server-oriented friendly branch of Ruby which inclu
 
 %build 
 cd source
-CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -02"
-export CFLAGS
-patch -p1 -R < ../fast-threading.patch
+%{__patch} -p1 -R < ../fast-threading.patch
 %configure \
+  --prefix=%{ruby_prefix} \
+  --exec-prefix=%{ruby_prefix} \
   --with-default-kcode=none \
   --enable-shared \
   --enable-pthread \
   --disable-rpath \
+  --program-suffix='-ree' \
   --with-readline-include=%{_includedir}/readline5 \
   --with-readline-lib=%{_libdir}/readline5 \
   --with-sitedir='%{ruby_sitelib}' \
@@ -61,23 +57,30 @@ patch -p1 -R < ../fast-threading.patch
   --with-vendordir='%{ruby_vendorlib}' \
   --with-vendorarchdir='%{ruby_vendorarch}'
 
-make
+%{__make} %{?_smp_mflags} CFLAGS="%{optflags} -fPIC -fno-strict-aliasing -g -D__LINUX__ -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
 
 %install
+%{__mkdir_p} $RPM_BUILD_ROOT/%{_sysconfdir}/profile.d/
+%{__mkdir_p} $RPM_BUILD_ROOT/%{_sysconfdir}/ld.so.conf.d/
 cd source
-make DESTDIR=$RPM_BUILD_ROOT \
-  install
-cp *.h $RPM_BUILD_ROOT/%{ruby_vendorarch}/%{rubyxver}/
+%{__make} DESTDIR=$RPM_BUILD_ROOT install 
+%{__cp} *.h $RPM_BUILD_ROOT/%{ruby_vendorarch}/%{rubyxver}/
+%{__install} -m 0755 %{SOURCE1} %{buildroot}/%{_sysconfdir}/profile.d/
+%{__cp} %{SOURCE2} %{buildroot}/%{_sysconfdir}/ld.so.conf.d/
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post 
+/sbin/ldconfig
+
 %files 
 %defattr(-,root,root)
-/usr/bin/*
-/usr/lib64/*
 /usr/share/man/man1/*
-%{ruby_vendorarch}/%{rubyxver}/*.h
+%{ruby_prefix}/*
+%{_sysconfdir}/profile.d/ruby-ee.sh
+%{_sysconfdir}/ld.so.conf.d/ruby-ee.conf
 
 %doc source/ChangeLog
 %doc source/COPYING
@@ -89,6 +92,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc source/ToDo
 
 %changelog
+* Wed Jul 27 2011 Sergio Rubio <rubiojr@frameos.org> - 1.8.7-9.2011.03
+- ruby-ee installs to /opt now and is parallel instalable with system ruby
+
 * Mon Apr 11 2011 Sergio Rubio <rubiojr@frameos.org> - 1.8.7-8.2011.03.frameos
 - Back to ruby-ee
 
